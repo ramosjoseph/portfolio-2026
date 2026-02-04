@@ -7,6 +7,8 @@ import { useProjects } from "./hooks/useProjects";
 import HUD from "./HUD";
 import NPC from "./NPC";
 import Terminal from "./Terminal";
+import Board from "./Board";
+
 
 type Position = {
   x: number;
@@ -28,6 +30,12 @@ const TERMINAL_POSITION = {
   y: 250,
 };
 
+const BOARD_POSITION = {
+  x: 250,
+  y: 280,
+};
+
+
 export default function Game() {
   const [player, setPlayer] = useState<Position>({ x: 50, y: 50 });
 
@@ -38,6 +46,10 @@ export default function Game() {
   const [showProjects, setShowProjects] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [showSkills, setShowSkills] = useState(false);
+
+  const [nearBoard, setNearBoard] = useState(false);
+  const [showContact, setShowContact] = useState(false);
+
 
   const { projects, loading } = useProjects();
 
@@ -73,6 +85,7 @@ export default function Game() {
         if (canInteract) setShowProjects(true);
         if (nearNPC) setShowAbout(true);
         if (nearTerminal) setShowSkills(true);
+        if (nearBoard) setShowContact(true);
       }
     };
 
@@ -107,6 +120,14 @@ export default function Game() {
     const dy = player.y - TERMINAL_POSITION.y;
     setNearTerminal(Math.sqrt(dx * dx + dy * dy) < 40);
   }, [player]);
+
+  // 📌 Board collision
+  useEffect(() => {
+    const dx = player.x - BOARD_POSITION.x;
+    const dy = player.y - BOARD_POSITION.y;
+    setNearBoard(Math.sqrt(dx * dx + dy * dy) < 40);
+  }, [player]);
+
 
   return (
     <section
@@ -148,6 +169,14 @@ export default function Game() {
         style={{ transform: `translate(${player.x}px, ${player.y}px)` }}
         aria-label="Player"
       />
+
+      {/* Board */}
+      <Board
+        x={BOARD_POSITION.x}
+        y={BOARD_POSITION.y}
+        label="Contact Board"
+     />
+
 
 
       {/* Interaction Prompt */}
@@ -256,6 +285,56 @@ export default function Game() {
           }
         />
       )}
+
+      {/* 📌 Board Dialog */}
+      {showContact && (
+  <Dialog
+    title="📬 Contact & Resume"
+    onClose={() => setShowContact(false)}
+    content={
+      <div className="space-y-3 text-sm">
+        <p>
+          Want to work together or learn more?
+        </p>
+
+        <div>
+          📧 <strong>Email:</strong>{" "}
+          <a
+            href="mailto:your.email@example.com"
+            className="text-cyan-400 underline"
+          >
+            your.email@example.com
+          </a>
+        </div>
+
+        <div>
+          💻 <strong>GitHub:</strong>{" "}
+          <a
+            href="https://github.com/yourusername"
+            target="_blank"
+            className="text-cyan-400 underline"
+            rel="noreferrer"
+          >
+            github.com/yourusername
+          </a>
+        </div>
+
+        <div>
+          📄{" "}
+          <a
+            href="/resume.pdf"
+            target="_blank"
+            className="text-cyan-400 underline font-semibold"
+          >
+            Download Resume
+          </a>
+        </div>
+      </div>
+    }
+  />
+)}
+
+
     </section>
   );
 }
