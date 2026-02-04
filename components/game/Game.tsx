@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import Interactable from "./Interactable";
 import Dialog from "./Dialog";
+import { useProjects } from "./hooks/useProjects";
+import HUD from "./HUD";
+import NPC from "./NPC";
 
 type Position = {
   x: number;
@@ -15,20 +18,35 @@ const INTERACTABLE = {
   size: 40,
 };
 
+const NPC_POSITION = {
+  x: 100,
+  y: 200,
+};
+
 export default function Game() {
   const [player, setPlayer] = useState<Position>({ x: 50, y: 50 });
   const [canInteract, setCanInteract] = useState(false);
-  const [showDialog, setShowDialog] = useState(false);
+  const [nearNPC, setNearNPC] = useState(false);
 
+  const [showProjects, setShowProjects] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
+
+  const { projects, loading } = useProjects();
+
+  // 🎮 Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (showDialog && e.key === "Escape") {
-        setShowDialog(false);
+      // Close dialogs
+      if (e.key === "Escape") {
+        setShowProjects(false);
+        setShowAbout(false);
         return;
       }
 
-      if (showDialog) return;
+      // Stop movement when dialog is open
+      if (showProjects || showAbout) return;
 
+      // Movement
       setPlayer((prev) => {
         const step = 10;
         let next = { ...prev };
@@ -41,16 +59,18 @@ export default function Game() {
         return next;
       });
 
-      if (e.key.toLowerCase() === "e" && canInteract) {
-        setShowDialog(true);
+      // Interaction
+      if (e.key.toLowerCase() === "e") {
+        if (canInteract) setShowProjects(true);
+        if (nearNPC) setShowAbout(true);
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [canInteract, showDialog]);
+  }, [canInteract, nearNPC, showProjects, showAbout]);
 
-  // Collision detection
+  // 📦 Chest collision
   useEffect(() => {
     const dx = player.x - INTERACTABLE.x;
     const dy = player.y - INTERACTABLE.y;
@@ -58,12 +78,32 @@ export default function Game() {
     setCanInteract(distance < 40);
   }, [player]);
 
+  // 🧍 NPC collision
+  useEffect(() => {
+    const dx = player.x - NPC_POSITION.x;
+    const dy = player.y - NPC_POSITION.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    setNearNPC(distance < 40);
+  }, [player]);
+
   return (
     <section
-      className="relative h-[400px] w-[600px] border border-white bg-gray-900"
+      className="relative h-[400px] w-[600px] overflow-hidden rounded-lg border border-white/20
+                 bg-gradient-to-br from-gray-900 via-black to-gray-800"
       role="application"
       aria-label="Portfolio game"
     >
+      {/* HUD */}
+      <HUD />
+
+      {/* NPC */}
+      <NPC
+        x={NPC_POSITION.x}
+        y={NPC_POSITION.y}
+        label="About Me NPC"
+      />
+
+      {/* Projects Chest */}
       <Interactable
         x={INTERACTABLE.x}
         y={INTERACTABLE.y}
@@ -72,29 +112,70 @@ export default function Game() {
 
       {/* Player */}
       <div
-        className="absolute h-8 w-8 rounded bg-green-500"
+        className="absolute h-8 w-8 rounded bg-green-500 shadow-lg shadow-green-500/30"
         style={{ transform: `translate(${player.x}px, ${player.y}px)` }}
         aria-label="Player"
       />
 
       {/* Interaction Prompt */}
-      {canInteract && !showDialog && (
+      {(canInteract || nearNPC) && !showProjects && !showAbout && (
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded bg-black px-3 py-1 text-sm text-white">
           Press <strong>E</strong> to interact
         </div>
       )}
 
-      {/* Dialog */}
-      {showDialog && (
+      {/* 📦 Projects Dialog */}
+      {showProjects && (
         <Dialog
           title="📦 Projects"
-          onClose={() => setShowDialog(false)}
+          onClose={() => setShowProjects(false)}
           content={
-            <p>
-              This chest will soon load my projects from an API.
-              <br />
-              <strong>(Coming next step!)</strong>
-            </p>
+            loading ? (
+              <p aria-live="polite">Loading projects...</p>
+            ) : (
+              <ul className="space-y-2">
+                {projects.map((project) => (
+                  <li key={project.id} className="rounded bg-gray-800 p-2">
+                    <h3 className="font-semibold">{project.title}</h3>
+                    <p className="text-xs">{project.description}</p>
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {project.tech.map((t) => (
+                        <span
+                          key={t}
+                          className="rounded bg-gray-700 px-2 py-0.5 text-[10px]"
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )
+          }
+        />
+      )}
+
+      {/* 🧍 About Me Dialog */}
+      {showAbout && (
+        <Dialog
+          title="👋 About Me"
+          onClose={() => setShowAbout(false)}
+          content={
+            <div className="space-y-2">
+              <p>
+                Hi! I’m <strong>Joseph Ramos</strong>, a web developer who enjoys
+                building interactive and accessible web experiences.
+              </p>
+              <p>
+                I work primarily with <strong>React, Next.js, and TypeScript</strong>,
+                and I care deeply about performance, clean architecture, and UX.
+              </p>
+              <p>
+                This portfolio is designed as a small game to demonstrate how I
+                approach frontend engineering — not just visuals.
+              </p>
+            </div>
           }
         />
       )}
