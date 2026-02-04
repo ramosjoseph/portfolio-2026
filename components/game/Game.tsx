@@ -6,6 +6,7 @@ import Dialog from "./Dialog";
 import { useProjects } from "./hooks/useProjects";
 import HUD from "./HUD";
 import NPC from "./NPC";
+import Terminal from "./Terminal";
 
 type Position = {
   x: number;
@@ -15,7 +16,6 @@ type Position = {
 const INTERACTABLE = {
   x: 300,
   y: 150,
-  size: 40,
 };
 
 const NPC_POSITION = {
@@ -23,28 +23,37 @@ const NPC_POSITION = {
   y: 200,
 };
 
+const TERMINAL_POSITION = {
+  x: 450,
+  y: 250,
+};
+
 export default function Game() {
   const [player, setPlayer] = useState<Position>({ x: 50, y: 50 });
+
   const [canInteract, setCanInteract] = useState(false);
   const [nearNPC, setNearNPC] = useState(false);
+  const [nearTerminal, setNearTerminal] = useState(false);
 
   const [showProjects, setShowProjects] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  const [showSkills, setShowSkills] = useState(false);
 
   const { projects, loading } = useProjects();
 
   // 🎮 Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Close dialogs
+      // Close ALL dialogs
       if (e.key === "Escape") {
         setShowProjects(false);
         setShowAbout(false);
+        setShowSkills(false);
         return;
       }
 
-      // Stop movement when dialog is open
-      if (showProjects || showAbout) return;
+      // Stop movement when ANY dialog is open
+      if (showProjects || showAbout || showSkills) return;
 
       // Movement
       setPlayer((prev) => {
@@ -63,32 +72,46 @@ export default function Game() {
       if (e.key.toLowerCase() === "e") {
         if (canInteract) setShowProjects(true);
         if (nearNPC) setShowAbout(true);
+        if (nearTerminal) setShowSkills(true);
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [canInteract, nearNPC, showProjects, showAbout]);
+  }, [
+    canInteract,
+    nearNPC,
+    nearTerminal,
+    showProjects,
+    showAbout,
+    showSkills,
+  ]);
 
   // 📦 Chest collision
   useEffect(() => {
     const dx = player.x - INTERACTABLE.x;
     const dy = player.y - INTERACTABLE.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    setCanInteract(distance < 40);
+    setCanInteract(Math.sqrt(dx * dx + dy * dy) < 40);
   }, [player]);
 
   // 🧍 NPC collision
   useEffect(() => {
     const dx = player.x - NPC_POSITION.x;
     const dy = player.y - NPC_POSITION.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    setNearNPC(distance < 40);
+    setNearNPC(Math.sqrt(dx * dx + dy * dy) < 40);
+  }, [player]);
+
+  // 💻 Terminal collision
+  useEffect(() => {
+    const dx = player.x - TERMINAL_POSITION.x;
+    const dy = player.y - TERMINAL_POSITION.y;
+    setNearTerminal(Math.sqrt(dx * dx + dy * dy) < 40);
   }, [player]);
 
   return (
     <section
-      className="relative h-[400px] w-[600px] overflow-hidden rounded-lg border border-white/20
+      className="relative h-[400px] w-[600px] overflow-hidden rounded-lg
+                 border border-white/20
                  bg-gradient-to-br from-gray-900 via-black to-gray-800"
       role="application"
       aria-label="Portfolio game"
@@ -101,6 +124,13 @@ export default function Game() {
         x={NPC_POSITION.x}
         y={NPC_POSITION.y}
         label="About Me NPC"
+      />
+
+      {/* Skills Terminal */}
+      <Terminal
+        x={TERMINAL_POSITION.x}
+        y={TERMINAL_POSITION.y}
+        label="Skills Terminal"
       />
 
       {/* Projects Chest */}
@@ -118,11 +148,15 @@ export default function Game() {
       />
 
       {/* Interaction Prompt */}
-      {(canInteract || nearNPC) && !showProjects && !showAbout && (
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded bg-black px-3 py-1 text-sm text-white">
-          Press <strong>E</strong> to interact
-        </div>
-      )}
+      {(canInteract || nearNPC || nearTerminal) &&
+        !showProjects &&
+        !showAbout &&
+        !showSkills && (
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2
+                          rounded bg-black px-3 py-1 text-sm text-white">
+            Press <strong>E</strong> to interact
+          </div>
+        )}
 
       {/* 📦 Projects Dialog */}
       {showProjects && (
@@ -175,6 +209,45 @@ export default function Game() {
                 This portfolio is designed as a small game to demonstrate how I
                 approach frontend engineering — not just visuals.
               </p>
+            </div>
+          }
+        />
+      )}
+
+      {/* 💻 Skills Dialog */}
+      {showSkills && (
+        <Dialog
+          title="💻 Skills Terminal"
+          onClose={() => setShowSkills(false)}
+          content={
+            <div className="font-mono text-sm space-y-3">
+              <div>
+                <span className="text-cyan-400">$</span> frontend
+                <ul className="ml-4 list-disc">
+                  <li>React</li>
+                  <li>Next.js</li>
+                  <li>TypeScript</li>
+                  <li>Tailwind CSS</li>
+                </ul>
+              </div>
+
+              <div>
+                <span className="text-cyan-400">$</span> backend
+                <ul className="ml-4 list-disc">
+                  <li>Node.js</li>
+                  <li>REST APIs</li>
+                  <li>Basic GraphQL</li>
+                </ul>
+              </div>
+
+              <div>
+                <span className="text-cyan-400">$</span> practices
+                <ul className="ml-4 list-disc">
+                  <li>Accessibility (WCAG)</li>
+                  <li>Performance optimization</li>
+                  <li>Git & CI/CD</li>
+                </ul>
+              </div>
             </div>
           }
         />
