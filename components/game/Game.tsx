@@ -142,10 +142,13 @@ export default function Game() {
 
       {/* Player */}
       <div
-        className="absolute h-8 w-8 rounded bg-green-500 shadow-lg shadow-green-500/30"
+        className="absolute h-8 w-8 rounded bg-green-500
+                   shadow-lg shadow-green-500/30
+                   transition-transform duration-100 ease-out"
         style={{ transform: `translate(${player.x}px, ${player.y}px)` }}
         aria-label="Player"
       />
+
 
       {/* Interaction Prompt */}
       {(canInteract || nearNPC || nearTerminal) &&
@@ -153,7 +156,8 @@ export default function Game() {
         !showAbout &&
         !showSkills && (
           <div className="absolute bottom-2 left-1/2 -translate-x-1/2
-                          rounded bg-black px-3 py-1 text-sm text-white">
+             rounded bg-black px-3 py-1 text-sm text-white
+             animate-bounce">
             Press <strong>E</strong> to interact
           </div>
         )}

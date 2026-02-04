@@ -25,7 +25,9 @@ export default function Dialog({ title, content, onClose }: Props) {
       <div
         ref={dialogRef}
         tabIndex={-1}
-        className="mb-6 w-[90%] max-w-md rounded-lg border border-white bg-gray-900 p-4 text-white outline-none"
+        className="mb-6 w-[90%] max-w-md rounded-lg border border-white
+           bg-gray-900 p-4 text-white outline-none
+           animate-in fade-in slide-in-from-bottom-4 duration-200"
       >
         <div className="flex items-center justify-between">
           <h2 id="dialog-title" className="text-lg font-bold">
