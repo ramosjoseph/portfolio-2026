@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Interactable from "./Interactable";
+import Dialog from "./Dialog";
 
 type Position = {
   x: number;
@@ -17,9 +18,17 @@ const INTERACTABLE = {
 export default function Game() {
   const [player, setPlayer] = useState<Position>({ x: 50, y: 50 });
   const [canInteract, setCanInteract] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (showDialog && e.key === "Escape") {
+        setShowDialog(false);
+        return;
+      }
+
+      if (showDialog) return;
+
       setPlayer((prev) => {
         const step = 10;
         let next = { ...prev };
@@ -33,20 +42,19 @@ export default function Game() {
       });
 
       if (e.key.toLowerCase() === "e" && canInteract) {
-        alert("📦 Projects chest opened!");
+        setShowDialog(true);
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [canInteract]);
+  }, [canInteract, showDialog]);
 
   // Collision detection
   useEffect(() => {
     const dx = player.x - INTERACTABLE.x;
     const dy = player.y - INTERACTABLE.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
-
     setCanInteract(distance < 40);
   }, [player]);
 
@@ -56,7 +64,6 @@ export default function Game() {
       role="application"
       aria-label="Portfolio game"
     >
-      {/* Interactable Object */}
       <Interactable
         x={INTERACTABLE.x}
         y={INTERACTABLE.y}
@@ -71,10 +78,25 @@ export default function Game() {
       />
 
       {/* Interaction Prompt */}
-      {canInteract && (
+      {canInteract && !showDialog && (
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded bg-black px-3 py-1 text-sm text-white">
           Press <strong>E</strong> to interact
         </div>
+      )}
+
+      {/* Dialog */}
+      {showDialog && (
+        <Dialog
+          title="📦 Projects"
+          onClose={() => setShowDialog(false)}
+          content={
+            <p>
+              This chest will soon load my projects from an API.
+              <br />
+              <strong>(Coming next step!)</strong>
+            </p>
+          }
+        />
       )}
     </section>
   );
