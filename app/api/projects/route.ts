@@ -10,17 +10,24 @@ export type Project = {
 const projects: Project[] = [
   {
     id: 1,
-    title: "JS Scent Order Management System",
+    title: "ReSourceHub — Sustainable Resource Exchange Platform",
     description:
-      "A web-based ordering system to automate perfume orders and notifications.",
-    tech: ["Next.js", "TypeScript", "REST API"],
+      "Built a mobile + web platform that enables communities to buy, sell, and trade reusable materials via direct exchange and competitive bidding. Designed for real-time sync, secure auth, image handling, push notifications, and AI-assisted item classification to reduce waste and support circular-economy behavior.",
+    tech: ["Flutter", "Dart", "Firebase", "Cloudinary", "OneSignal", "Teachable Machine"],
   },
   {
     id: 2,
+    title: "JS Scent — Order Management System",
+    description:
+      "An ordering and tracking system designed to automate order flow, reduce manual follow-ups, and keep customers updated through structured status and notifications.",
+    tech: ["Next.js", "TypeScript", "REST API"],
+  },
+  {
+    id: 3,
     title: "Interactive Game Portfolio",
     description:
-      "A game-like portfolio demonstrating frontend architecture and UX.",
-    tech: ["React", "Tailwind", "Accessibility"],
+      "A mini-game portfolio demonstrating component architecture, state handling, accessibility, and performance-focused UI decisions—built to be fun but engineered like a real product.",
+    tech: ["Next.js", "React", "TypeScript", "Tailwind", "Accessibility"],
   },
 ];
 

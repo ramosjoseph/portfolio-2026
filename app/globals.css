@@ -25,3 +25,48 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.kbd {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  font-size: 11px;
+  line-height: 1;
+}
+
+/* --- Pixel rendering helper --- */
+.pixelated {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* --- Subtle grid + vignette background for the game board --- */
+.game-board {
+  background:
+    radial-gradient(1000px 600px at 50% 40%, rgba(56, 189, 248, 0.10), transparent 60%),
+    radial-gradient(700px 500px at 20% 70%, rgba(34, 197, 94, 0.08), transparent 55%),
+    radial-gradient(700px 500px at 80% 75%, rgba(244, 114, 182, 0.08), transparent 55%),
+    linear-gradient(#0b0f1a, #0b0f1a);
+  position: relative;
+}
+
+.game-board::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+  opacity: 0.22;
+  pointer-events: none;
+}
+
+.game-board::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 45%, transparent 55%, rgba(0,0,0,0.55) 100%);
+  pointer-events: none;
+}
+

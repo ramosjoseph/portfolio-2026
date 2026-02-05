@@ -1,22 +1,10 @@
-type Props = {
-  x: number;
-  y: number;
-  label: string;
-};
+import { Terminal as TerminalIcon } from "lucide-react";
 
-export default function Terminal({ x, y, label }: Props) {
+export default function Terminal({ x, y, label }) {
   return (
-    <div
-      className="absolute h-10 w-12 rounded bg-gray-800
-           border border-cyan-400/50
-           shadow-md shadow-cyan-500/40
-           flex items-center justify-center
-           text-cyan-400 text-xs font-mono
-           animate-[blink_1.5s_steps(2,start)_infinite]"
-      style={{ left: x, top: y }}
-      aria-label={label}
-    >
-      &gt;_
+    <div className="absolute flex flex-col items-center gap-1" style={{ transform: `translate(${x}px, ${y}px)` }}>
+      <TerminalIcon className="h-14 w-14 text-green-400 drop-shadow-lg" />
+      <span className="text-xs text-white/70">{label}</span>
     </div>
   );
 }

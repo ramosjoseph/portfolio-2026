@@ -1,23 +1,10 @@
-type Props = {
-  x: number;
-  y: number;
-  label: string;
-};
+import { FileText } from "lucide-react";
 
-export default function Board({ x, y, label }: Props) {
+export default function Board({ x, y, label }) {
   return (
-    <div
-      className="absolute h-12 w-12 rounded-md
-                 bg-yellow-700 border border-yellow-500
-                 shadow-md shadow-yellow-400/40
-                 flex items-center justify-center
-                 text-xs font-semibold text-black
-                 transition-transform duration-200
-                 hover:scale-105"
-      style={{ left: x, top: y }}
-      aria-label={label}
-    >
-      📌
+    <div className="absolute flex flex-col items-center gap-1" style={{ transform: `translate(${x}px, ${y}px)` }}>
+      <FileText className="h-14 w-14 text-pink-400 drop-shadow-lg" />
+      <span className="text-xs text-white/70">{label}</span>
     </div>
   );
 }
