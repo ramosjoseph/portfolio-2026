@@ -147,10 +147,10 @@ export default function Game() {
 
   const promptText = useMemo(() => {
   if (anyDialogOpen) return null;
-  if (nearProjects) return "Press E to open Projects";
-  if (nearNPC) return "Press E to talk (About Me)";
-  if (nearTerminal) return "Press E to view Skills";
-  if (nearBoard) return "Press E to open Contact";
+  if (nearProjects) return "to open Projects";
+  if (nearNPC) return "to talk (About Me)";
+  if (nearTerminal) return "to view Skills";
+  if (nearBoard) return "to open Contact";
   return null;
 }, [anyDialogOpen, nearProjects, nearNPC, nearTerminal, nearBoard]);
 
@@ -187,11 +187,13 @@ export default function Game() {
       {promptText && (
   <div
     className="absolute bottom-4 left-1/2 -translate-x-1/2
-               rounded-lg bg-black/70 px-4 py-2 text-base text-white
-               border border-white/10"
+               rounded-lg bg-black/75 px-4 py-2 text-base text-white
+               border border-white/10 flex items-center gap-2"
     aria-live="polite"
   >
-    <span className="kbd">E</span> {promptText.replace("Press E", "").trim()}
+    <span>Press</span>
+    <span className="kbd">E</span>
+    <span>{promptText}</span>
   </div>
 )}
 
